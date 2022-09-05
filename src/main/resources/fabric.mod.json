@@ -1,29 +1,27 @@
 {
   "schemaVersion": 1,
-  "id": "modid",
+  "id": "walk-jog-run",
   "version": "${version}",
 
-  "name": "Example Mod",
-  "description": "This is an example description! Tell everyone what your mod is about!",
-  "authors": [
-    "Me!"
-  ],
+  "name": "Walk, Jog, Run",
+  "description": "Adds a slower walking state along with the default jogging and sprinting states and adds stamina for sprinting",
+  "authors": [ "Minenash", "VOLOS" ],
   "contact": {
     "homepage": "https://fabricmc.net/",
     "sources": "https://github.com/FabricMC/fabric-example-mod"
   },
 
-  "license": "CC0-1.0",
-  "icon": "assets/modid/icon.png",
+  "license": "LGPL-3.0",
+  "icon": "assets/walk-jog-run/icon.png",
 
   "environment": "*",
   "entrypoints": {
     "main": [
-      "net.fabricmc.example.ExampleMod"
+      "com.minenash.walk_jog_run.WalkJogRun"
     ]
   },
   "mixins": [
-    "modid.mixins.json"
+    "walk-jog-run.mixins.json"
   ],
 
   "depends": {
@@ -31,8 +29,5 @@
     "fabric-api": "*",
     "minecraft": "~1.19",
     "java": ">=17"
-  },
-  "suggests": {
-    "another-mod": "*"
   }
 }
