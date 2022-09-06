@@ -9,8 +9,8 @@ Players can use the <kbd>TAB</kbd> key (configurable) to switch between the walk
 
 The updated values for player speed can be found below:
 - Player Walk Speed: 0.07 *(-.03 Usual Move-speed)*
-- Player Jog Speed: 0.1 *(Normal Player Movement)*
-- Player Sprint Speed: *Unaffected*
+- Player Jog Speed: 0.1 *(Normal Speed)*
+- Player Sprint Speed: 0.3 *(Normal Sprint Speed)*
 
 ### Stamina
 

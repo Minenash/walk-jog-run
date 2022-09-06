@@ -16,13 +16,10 @@
 
   "environment": "*",
   "entrypoints": {
-    "main": [
-      "com.minenash.walk_jog_run.WalkJogRun"
-    ]
+    "main": [ "com.minenash.walk_jog_run.WalkJogRun" ],
+    "client": [ "com.minenash.walk_jog_run.WalkJogRunClient" ]
   },
-  "mixins": [
-    "walk-jog-run.mixins.json"
-  ],
+  "mixins": [ "walk-jog-run.mixins.json" ],
 
   "depends": {
     "fabricloader": ">=0.14.9",
