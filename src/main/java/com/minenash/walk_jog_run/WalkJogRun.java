@@ -1,5 +1,6 @@
 package com.minenash.walk_jog_run;
 
+import com.minenash.walk_jog_run.config.Config;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
@@ -30,17 +31,24 @@ public class WalkJogRun implements ModInitializer {
 	public static final Logger LOGGER = LoggerFactory.getLogger("walk-jog-run");
 
 	private static final UUID STROLLING_SPEED_MODIFIER_ID = UUID.fromString("662A6B8D-DA3E-4C1C-8813-96EA6097278E");
-	private static final EntityAttributeModifier STROLLING_SPEED_MODIFIER = new EntityAttributeModifier(STROLLING_SPEED_MODIFIER_ID, "Strolling speed modification", -0.3D, EntityAttributeModifier.Operation.MULTIPLY_TOTAL);
+	private static EntityAttributeModifier STROLLING_SPEED_MODIFIER;
 	public static final Identifier STROLL_ONE_CM = id("stroll_one_cm");
 
 	public static final Map<PlayerEntity, Boolean> strolling = new HashMap<>();
 	public static final Map<PlayerEntity, Integer> stamina = new HashMap<>();
+
+	//TODO: Config
+
+    //TODO: Test on Server
 
 	@Override
 	public void onInitialize() {
 
 		Registry.register(Registry.CUSTOM_STAT, "stroll_one_cm", STROLL_ONE_CM);
 		Stats.CUSTOM.getOrCreateStat(STROLL_ONE_CM, StatFormatter.DISTANCE);
+
+		STROLLING_SPEED_MODIFIER = new EntityAttributeModifier(STROLLING_SPEED_MODIFIER_ID, "Strolling speed modification",
+				Config.STROLLING_SPEED_MODIFIER, EntityAttributeModifier.Operation.MULTIPLY_TOTAL);
 
 		ServerPlayNetworking.registerGlobalReceiver( id("strolling"), (server, player, handler, buf, responseSender) -> {
 			EntityAttributeInstance movement = player.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED);
@@ -63,17 +71,17 @@ public class WalkJogRun implements ModInitializer {
 		ServerTickEvents.START_SERVER_TICK.register(id("stamina"), server -> {
 			for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
 
-				int max_stamina = player.getHungerManager().getFoodLevel() * 40;
+				int max_stamina = player.getHungerManager().getFoodLevel() * Config.STAMINA_PER_FOOD_LEVEL;
 				int player_stamina = stamina.getOrDefault(player, max_stamina);
 
 				if (player.isSprinting())
-					player_stamina -= 2;
+					player_stamina -= Config.STAMINA_DEPLETION_PER_TICK;
 				else
-					player_stamina += strolling.getOrDefault(player, false) ? 2 : 1;
+					player_stamina += strolling.getOrDefault(player, false) ? Config.STAMINA_RECOVERY_STROLLING : Config.STAMINA_RECOVERY_WALKING;
 
 				if (player_stamina < 0) {
 					player.setSprinting(false);
-					player.addStatusEffect( new StatusEffectInstance(StatusEffects.SLOWNESS, 100));
+					player.addStatusEffect( new StatusEffectInstance(StatusEffects.SLOWNESS, Config.STAMINA_EXHAUSTED_SLOWNESS_DURATION_IN_TICKS, 0, false, Config.STAMINA_EXHAUSTED_SLOWNESS_SHOW_PARTICLES));
 				}
 
 				setStamina(player, MathHelper.clamp(player_stamina, 0, max_stamina));

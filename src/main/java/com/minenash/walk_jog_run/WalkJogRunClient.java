@@ -1,5 +1,6 @@
 package com.minenash.walk_jog_run;
 
+import com.minenash.walk_jog_run.config.Config;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -12,7 +13,6 @@ import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.InputUtil;
-import net.minecraft.client.util.Window;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.text.Text;
 import net.minecraft.util.Arm;
@@ -21,7 +21,7 @@ import org.lwjgl.glfw.GLFW;
 
 public class WalkJogRunClient implements ClientModInitializer {
 
-    public static final KeyBinding STROLLING_KEYBIND = keybind("strolling", GLFW.GLFW_KEY_TAB);
+    public static final KeyBinding STROLLING_KEYBIND = keybind("strolling", GLFW.GLFW_KEY_LEFT_ALT);
 
     private static KeyBinding keybind(String key, int defaultKey) {
         KeyBinding binding = new KeyBinding("walkjogrun.keybind." + key, InputUtil.Type.KEYSYM, defaultKey, KeyBinding.MOVEMENT_CATEGORY);
@@ -75,7 +75,7 @@ public class WalkJogRunClient implements ClientModInitializer {
 
             int y = client.getWindow().getScaledHeight() - 20;
             int x = client.getWindow().getScaledWidth() / 2 + (client.player.getMainArm() == Arm.RIGHT ? 92 : -110);
-            int max_stamina = client.player.getHungerManager().getFoodLevel() * 40;
+            int max_stamina = client.player.getHungerManager().getFoodLevel() * Config.STAMINA_PER_FOOD_LEVEL;
 
             RenderSystem.setShader(GameRenderer::getPositionTexShader);
             RenderSystem.enableDepthTest();
