@@ -30,7 +30,7 @@ public class WalkJogRun implements ModInitializer {
 	public static final Logger LOGGER = LoggerFactory.getLogger("walk-jog-run");
 
 	private static final UUID STROLLING_SPEED_MODIFIER_ID = UUID.fromString("662A6B8D-DA3E-4C1C-8813-96EA6097278E");
-	private static final EntityAttributeModifier STROLLING_SPEED_MODIFIER = new EntityAttributeModifier(STROLLING_SPEED_MODIFIER_ID, "Strolling speed modification", -0.3f, EntityAttributeModifier.Operation.MULTIPLY_TOTAL);
+	private static final EntityAttributeModifier STROLLING_SPEED_MODIFIER = new EntityAttributeModifier(STROLLING_SPEED_MODIFIER_ID, "Strolling speed modification", -0.3D, EntityAttributeModifier.Operation.MULTIPLY_TOTAL);
 	public static final Identifier STROLL_ONE_CM = id("stroll_one_cm");
 
 	public static final Map<PlayerEntity, Boolean> strolling = new HashMap<>();

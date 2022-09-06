@@ -8,9 +8,9 @@ This is to promote slower player movement without detracting from the typical Mi
 Players can use the <kbd>TAB</kbd> key (configurable) to switch between the walking and jogging states.
 
 The updated values for player speed can be found below:
-- Player Walk Speed: 0.07 *(-.03 Usual Move-speed)*
-- Player Jog Speed: 0.1 *(Normal Speed)*
-- Player Sprint Speed: 0.3 *(Normal Sprint Speed)*
+- Player Walk Speed: 0.49 *(30% Slower)*
+- Player Jog Speed: 0.7 *(Normal Speed)*
+- Player Sprint Speed: 0.91 *(30% Faster, Normal Sprint Speed)*
 
 ### Stamina
 
