@@ -1,6 +1,5 @@
 package com.minenash.walk_jog_run;
 
-import com.minenash.walk_jog_run.config.Config;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
@@ -30,14 +29,25 @@ public class WalkJogRun implements ModInitializer {
 
 	public static final Logger LOGGER = LoggerFactory.getLogger("walk-jog-run");
 
+	private static final UUID BASE_SPEED_MODIFIER_ID = UUID.fromString("662A6B8D-DA3E-4C1C-8813-96EA6097278C");
+	private static final EntityAttributeModifier BASE_SPEED_MODIFIER;
+	private static final boolean USE_BASE_SPEED_MODIFIER;
+
 	private static final UUID STROLLING_SPEED_MODIFIER_ID = UUID.fromString("662A6B8D-DA3E-4C1C-8813-96EA6097278E");
-	private static EntityAttributeModifier STROLLING_SPEED_MODIFIER;
+	private static final EntityAttributeModifier STROLLING_SPEED_MODIFIER;
 	public static final Identifier STROLL_ONE_CM = id("stroll_one_cm");
 
 	public static final Map<PlayerEntity, Boolean> strolling = new HashMap<>();
 	public static final Map<PlayerEntity, Integer> stamina = new HashMap<>();
 
-	//TODO: Config
+	static {
+		Config.read();
+		STROLLING_SPEED_MODIFIER = new EntityAttributeModifier(STROLLING_SPEED_MODIFIER_ID, "WalkJogRun: Strolling speed modification",
+				Config.STROLLING_SPEED_MODIFIER, EntityAttributeModifier.Operation.MULTIPLY_TOTAL);
+		BASE_SPEED_MODIFIER = new EntityAttributeModifier(BASE_SPEED_MODIFIER_ID, "WalkJogRun: Base speed modification",
+				Config.BASE_WALKING_SPEED_MODIFIER, EntityAttributeModifier.Operation.MULTIPLY_TOTAL);
+		USE_BASE_SPEED_MODIFIER = Config.BASE_WALKING_SPEED_MODIFIER != 0;
+	}
 
     //TODO: Test on Server
 
@@ -46,9 +56,6 @@ public class WalkJogRun implements ModInitializer {
 
 		Registry.register(Registry.CUSTOM_STAT, "stroll_one_cm", STROLL_ONE_CM);
 		Stats.CUSTOM.getOrCreateStat(STROLL_ONE_CM, StatFormatter.DISTANCE);
-
-		STROLLING_SPEED_MODIFIER = new EntityAttributeModifier(STROLLING_SPEED_MODIFIER_ID, "Strolling speed modification",
-				Config.STROLLING_SPEED_MODIFIER, EntityAttributeModifier.Operation.MULTIPLY_TOTAL);
 
 		ServerPlayNetworking.registerGlobalReceiver( id("strolling"), (server, player, handler, buf, responseSender) -> {
 			EntityAttributeInstance movement = player.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED);
@@ -70,6 +77,12 @@ public class WalkJogRun implements ModInitializer {
 
 		ServerTickEvents.START_SERVER_TICK.register(id("stamina"), server -> {
 			for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
+
+				if (USE_BASE_SPEED_MODIFIER) {
+					EntityAttributeInstance instance = player.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED);
+					if (instance != null && !instance.hasModifier(BASE_SPEED_MODIFIER))
+						instance.addTemporaryModifier(BASE_SPEED_MODIFIER);
+				}
 
 				int max_stamina = player.getHungerManager().getFoodLevel() * Config.STAMINA_PER_FOOD_LEVEL;
 				int player_stamina = stamina.getOrDefault(player, max_stamina);

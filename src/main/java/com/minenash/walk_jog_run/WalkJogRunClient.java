@@ -1,6 +1,5 @@
 package com.minenash.walk_jog_run;
 
-import com.minenash.walk_jog_run.config.Config;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -41,6 +40,7 @@ public class WalkJogRunClient implements ClientModInitializer {
     private static final Identifier STROLLING_FILL_TEXTURE = WalkJogRun.id("textures/gui/strolling_fill.png");
     private static final Identifier WALKING_FILL_TEXTURE = WalkJogRun.id("textures/gui/walking_fill.png");
     private static final Identifier SPRINTING_FILL_TEXTURE = WalkJogRun.id("textures/gui/sprinting_fill.png");
+    private static final Identifier HUNGER_STAMINA_TEXTURE = WalkJogRun.id("textures/gui/hunger_stamina.png");
 
     private static final MinecraftClient client = MinecraftClient.getInstance();
 
@@ -88,6 +88,30 @@ public class WalkJogRunClient implements ClientModInitializer {
 
                 int height = 20 - (int) (20F*stamina/max_stamina);
                 DrawableHelper.drawTexture(matrix, x, y, 20, height, 0, 0, 100, (int)(height/20F*100), 100, 100);
+
+
+                RenderSystem.setShaderTexture(0, HUNGER_STAMINA_TEXTURE);
+
+                int o = client.getWindow().getScaledHeight() - 39;
+                int n = client.getWindow().getScaledWidth() / 2 + 91 - 9;
+
+                double s = stamina / 8.888;
+
+                for (int x2 = 0; x2 < 10; ++x2) {
+                    if (s > x2*9) {
+                        int ss = (int) (s - x2*9);
+
+                        if (ss > 8)
+                            DrawableHelper.drawTexture(matrix, n - x2 * 8, o, 0, 0, 9, 9, 9, 9);
+                        else
+                            DrawableHelper.drawTexture(matrix, n - x2 * 8 + (9 - ss), o, 9 - ss, 0, ss, 9, 9, 9);
+
+                    }
+                }
+
+
+
+
             }
 
             DrawableHelper.drawTextWithShadow(matrix, client.textRenderer, Text.literal("Stamina: §e" + stamina), 5, 5, 0xFFFFFF);
