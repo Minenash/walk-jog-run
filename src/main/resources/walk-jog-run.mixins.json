@@ -4,12 +4,12 @@
   "package": "com.minenash.walk_jog_run.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "ClientPlayerEntityMixin",
-    "InGameHudMixin",
     "LivingEntityAccessor",
     "PlayerEntityMixin"
   ],
   "client": [
+    "ClientPlayerEntityMixin",
+    "InGameHudMixin"
   ],
   "injectors": {
     "defaultRequire": 1
