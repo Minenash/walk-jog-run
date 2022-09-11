@@ -32,7 +32,7 @@ public class InGameHudMixin {
     }
 
     @Inject(method = "renderStatusBars", locals = LocalCapture.CAPTURE_FAILHARD, at = @At(value = "INVOKE", ordinal = 3, target = "Lnet/minecraft/client/gui/hud/InGameHud;drawTexture(Lnet/minecraft/client/util/math/MatrixStack;IIIIII)V"))
-    public void efe(MatrixStack matrices, CallbackInfo callback, PlayerEntity playerEntity, int i, boolean bl, long l, int j, HungerManager hungerManager, int k, int m, int n, int o, float f, int p, int q, int r, int s, int t, int u, int v, LivingEntity livingEntity, int x, int y, int z, int aa, int ab, int ac) {
+    public void walkJogRun$getHungerBarYValues(MatrixStack matrices, CallbackInfo callback, PlayerEntity playerEntity, int i, boolean bl, long l, int j, HungerManager hungerManager, int k, int m, int n, int o, float f, int p, int q, int r, int s, int t, int u, int v, LivingEntity livingEntity, int x, int y, int z, int aa, int ab, int ac) {
         WalkJogRunClient.hungerBarStaminaYValues[y] = z;
     }
 
