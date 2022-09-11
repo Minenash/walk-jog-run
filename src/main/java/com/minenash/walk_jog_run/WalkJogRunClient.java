@@ -36,7 +36,7 @@ public class WalkJogRunClient implements ClientModInitializer {
     boolean wasSprinting = false;
     boolean wasStrolling = false;
 
-    int stamina = 200;
+    public static int stamina = 200;
 
     private static final Identifier STROLLING_TEXTURE = WalkJogRun.id("textures/gui/strolling.png");
     private static final Identifier WALKING_TEXTURE = WalkJogRun.id("textures/gui/walking.png");
@@ -47,6 +47,8 @@ public class WalkJogRunClient implements ClientModInitializer {
     private static final Identifier HUNGER_STAMINA_TEXTURE = WalkJogRun.id("textures/gui/hunger_stamina.png");
 
     private static final MinecraftClient client = MinecraftClient.getInstance();
+
+    public static int[] hungerBarStaminaYValues = new int[10];
 
     @Override
     public void onInitializeClient() {
@@ -110,7 +112,6 @@ public class WalkJogRunClient implements ClientModInitializer {
                 if (ClientConfig.showStaminaInHungerBar) {
                     RenderSystem.setShaderTexture(0, HUNGER_STAMINA_TEXTURE);
 
-                    int o = client.getWindow().getScaledHeight() - 39;
                     int n = client.getWindow().getScaledWidth() / 2 + 91 - 9;
 
                     double s = stamina / 8.888;
@@ -126,7 +127,7 @@ public class WalkJogRunClient implements ClientModInitializer {
 //                    }
                         if (s <= x2 * 9 + 9) {
                             int ss = (int) (x2 * 9 + 9 - s);
-                            DrawableHelper.drawTexture(matrix, n - x2 * 8, o, 0, 0, ss > 8 ? 9 : ss, 9, 9, 9);
+                            DrawableHelper.drawTexture(matrix, n - x2 * 8, hungerBarStaminaYValues[x2], 0, 0, ss > 8 ? 9 : ss, 9, 9, 9);
                         }
                     }
                 }

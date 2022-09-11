@@ -1,3 +1,13 @@
 {
-  "stat.walk-jog-run.stroll_one_cm": "Distance Strolled"
+  "stat.walk-jog-run.stroll_one_cm": "Distance Strolled",
+  "walk-jog-run-client.midnightconfig.title": "Walk, Jog, Run!",
+  "walk-jog-run-client.midnightconfig.iconPosition": "Icon Position",
+  "walk-jog-run-client.midnightconfig.showStaminaInIcon": "Show Stamina In Icon",
+  "walk-jog-run-client.midnightconfig.showStaminaInHungerBar": "Show Stamina In Hunger Bar",
+  "walk-jog-run-client.midnightconfig.enum.IconPosition.HOTBAR": "Hotbar",
+  "walk-jog-run-client.midnightconfig.enum.IconPosition.CROSSHAIR": "Crosshair",
+  "walk-jog-run-client.midnightconfig.enum.IconPosition.TOP_LEFT_CORNER": "Top Left",
+  "walk-jog-run-client.midnightconfig.enum.IconPosition.TOP_RIGHT_CORNER": "Top Right",
+  "walk-jog-run-client.midnightconfig.enum.IconPosition.BOTTOM_LEFT_CORNER": "Bottom Left",
+  "walk-jog-run-client.midnightconfig.enum.IconPosition.BOTTOM_RIGHT_CORNER": "Bottom RIght"
 }
