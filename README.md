@@ -1,7 +1,6 @@
 # Walk Jog Run
 
 ### Walking
-This mod adds a slight change to the way Minecraft movement functions. 
 This mod allows players to toggle between a slower walking pace and the usual jogging state.
 This is to promote slower player movement without detracting from the typical Minecraft experience.
 

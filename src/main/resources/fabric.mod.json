@@ -4,11 +4,17 @@
   "version": "${version}",
 
   "name": "Walk, Jog, Run",
-  "description": "Adds a slower walking state along with the default jogging and sprinting states and adds stamina for sprinting",
+  "description": "Adds strolling and replaces sprinting exhaustion with stamina caped by hunger",
   "authors": [ "Minenash", "VOLOS" ],
   "contact": {
-    "homepage": "https://fabricmc.net/",
-    "sources": "https://github.com/FabricMC/fabric-example-mod"
+    "homepage": "https://modrinth.com/mod/walk-jog-run",
+    "sources": "https://github.com/Minenash/walk-jog-run",
+    "issues": "https://github.com/Minenash/walk-jog-run/issues"
+  },
+
+
+  "custom": {
+    "modmenu": { "links": { "modmenu.discord": "https://discord.gg/eYf7DDHhvN" } }
   },
 
   "license": "LGPL-3.0",
