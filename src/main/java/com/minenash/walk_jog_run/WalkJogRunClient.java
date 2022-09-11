@@ -1,9 +1,12 @@
 package com.minenash.walk_jog_run;
 
+import com.minenash.walk_jog_run.config.ClientConfig;
+import com.minenash.walk_jog_run.config.ServerConfig;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
@@ -16,6 +19,7 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.text.Text;
 import net.minecraft.util.Arm;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Pair;
 import org.lwjgl.glfw.GLFW;
 
 public class WalkJogRunClient implements ClientModInitializer {
@@ -47,6 +51,8 @@ public class WalkJogRunClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
 
+        ClientConfig.init("walk-jog-run-client", ClientConfig.class);
+
         ClientTickEvents.END_WORLD_TICK.register(client -> {
 
             if (isSprinting() != wasSprinting) {
@@ -70,57 +76,91 @@ public class WalkJogRunClient implements ClientModInitializer {
             stamina = buf.readInt();
         });
 
+        ClientPlayNetworking.registerGlobalReceiver(WalkJogRun.id("sync_config"), (client1, handler, buf, responseSender) -> {
+            ServerConfig.applyConfig(buf.readString());
+        });
+
+        ClientPlayConnectionEvents.DISCONNECT.register(WalkJogRun.id("sync_correct"), (handler, client1) -> {
+            ServerConfig.read();
+
+        });
+
         HudRenderCallback.EVENT.register( WalkJogRun.id("icon_render"), (matrix, tickDelta) -> {
             matrix.push();
 
-            int y = client.getWindow().getScaledHeight() - 20;
-            int x = client.getWindow().getScaledWidth() / 2 + (client.player.getMainArm() == Arm.RIGHT ? 92 : -110);
-            int max_stamina = client.player.getHungerManager().getFoodLevel() * Config.STAMINA_PER_FOOD_LEVEL;
+            int y = getIconY();
+            int x = getIconX();
+            int size = ClientConfig.iconPosition == ClientConfig.IconPosition.CROSSHAIR ? 10 : 16;
+            int max_stamina = client.player.getHungerManager().getFoodLevel() * ServerConfig.STAMINA_PER_FOOD_LEVEL;
 
             RenderSystem.setShader(GameRenderer::getPositionTexShader);
             RenderSystem.enableDepthTest();
 
             RenderSystem.setShaderTexture(0, isSprinting() ? SPRINTING_TEXTURE : isStrolling ? STROLLING_TEXTURE : WALKING_TEXTURE);
-            DrawableHelper.drawTexture(matrix, x, y, 20, 20, 0, 0, 100, 100, 100, 100);
+            DrawableHelper.drawTexture(matrix, x, y, size, size, 0, 0, 80, 80, 80, 80);
 
-            if (stamina < max_stamina) {
-                RenderSystem.setShaderTexture(0, isSprinting() ? SPRINTING_FILL_TEXTURE : isStrolling ? STROLLING_FILL_TEXTURE : WALKING_FILL_TEXTURE);
+            if (stamina < max_stamina && !client.player.isCreative()) {
+                if (ClientConfig.showStaminaInIcon) {
+                    RenderSystem.setShaderTexture(0, isSprinting() ? SPRINTING_FILL_TEXTURE : isStrolling ? STROLLING_FILL_TEXTURE : WALKING_FILL_TEXTURE);
 
-                int height = 20 - (int) (20F*stamina/max_stamina);
-                DrawableHelper.drawTexture(matrix, x, y, 20, height, 0, 0, 100, (int)(height/20F*100), 100, 100);
+                    int height = size - (int) (1F * size * stamina / max_stamina);
+                    DrawableHelper.drawTexture(matrix, x, y, size, height, 0, 0, 80, (int) (80F * height / size), 80, 80);
+                }
 
+                if (ClientConfig.showStaminaInHungerBar) {
+                    RenderSystem.setShaderTexture(0, HUNGER_STAMINA_TEXTURE);
 
-                RenderSystem.setShaderTexture(0, HUNGER_STAMINA_TEXTURE);
+                    int o = client.getWindow().getScaledHeight() - 39;
+                    int n = client.getWindow().getScaledWidth() / 2 + 91 - 9;
 
-                int o = client.getWindow().getScaledHeight() - 39;
-                int n = client.getWindow().getScaledWidth() / 2 + 91 - 9;
+                    double s = stamina / 8.888;
 
-                double s = stamina / 8.888;
-
-                for (int x2 = 0; x2 < 10; ++x2) {
-                    if (s > x2*9) {
-                        int ss = (int) (s - x2*9);
-
-                        if (ss > 8)
-                            DrawableHelper.drawTexture(matrix, n - x2 * 8, o, 0, 0, 9, 9, 9, 9);
-                        else
-                            DrawableHelper.drawTexture(matrix, n - x2 * 8 + (9 - ss), o, 9 - ss, 0, ss, 9, 9, 9);
-
+                    for (int x2 = 0; x2 < 10; ++x2) {
+//                    if (s > x2*9) {
+//                        int ss = (int) (s - x2*9);
+//
+//                        if (ss > 8)
+//                            DrawableHelper.drawTexture(matrix, n - x2 * 8, o, 0, 0, 9, 9, 9, 9);
+//                        else
+//                            DrawableHelper.drawTexture(matrix, n - x2 * 8 + (9 - ss), o, 9 - ss, 0, ss, 9, 9, 9);
+//                    }
+                        if (s <= x2 * 9 + 9) {
+                            int ss = (int) (x2 * 9 + 9 - s);
+                            DrawableHelper.drawTexture(matrix, n - x2 * 8, o, 0, 0, ss > 8 ? 9 : ss, 9, 9, 9);
+                        }
                     }
                 }
 
-
-
-
             }
 
-            DrawableHelper.drawTextWithShadow(matrix, client.textRenderer, Text.literal("Stamina: §e" + stamina), 5, 5, 0xFFFFFF);
+//            DrawableHelper.drawTextWithShadow(matrix, client.textRenderer, Text.literal("Stamina: §e" + stamina), 5, 5, 0xFFFFFF);
 
             matrix.pop();
 
         });
 
     }
+
+    private int getIconY() {
+        int height = client.getWindow().getScaledHeight();
+        return switch (ClientConfig.iconPosition) {
+            case HOTBAR -> height - 20 + 2;
+            case CROSSHAIR -> height / 2 + 1;
+            case TOP_LEFT_CORNER, TOP_RIGHT_CORNER -> 5;
+            case BOTTOM_LEFT_CORNER, BOTTOM_RIGHT_CORNER -> height - 20;
+        };
+    }
+
+    private int getIconX() {
+        int width = client.getWindow().getScaledWidth();
+        return switch (ClientConfig.iconPosition) {
+            case HOTBAR -> width / 2 + (client.player.getMainArm() == Arm.RIGHT ? 92 : -110) + 2;
+            case CROSSHAIR -> width / 2 + 1;
+            case TOP_LEFT_CORNER, BOTTOM_LEFT_CORNER -> 5;
+            case TOP_RIGHT_CORNER, BOTTOM_RIGHT_CORNER -> width - 20;
+        };
+    }
+
 
     private boolean isSprinting() {
         return client.player.isSprinting();

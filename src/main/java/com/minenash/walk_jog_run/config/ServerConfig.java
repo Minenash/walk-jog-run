@@ -1,4 +1,4 @@
-package com.minenash.walk_jog_run;
+package com.minenash.walk_jog_run.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -8,7 +8,7 @@ import java.lang.reflect.Modifier;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class Config {
+public class ServerConfig {
 
     public static double STROLLING_SPEED_MODIFIER = -0.3;
     public static double SPRINTING_SPEED_MODIFIER = 0.3;
@@ -22,8 +22,7 @@ public class Config {
     public static int STAMINA_EXHAUSTED_SLOWNESS_DURATION_IN_TICKS = 100;
     public static boolean STAMINA_EXHAUSTED_SLOWNESS_SHOW_PARTICLES = true;
 
-    //TODO: Implement base speed config options
-
+    public static String JSON = "";
 
     private static final Path path = FabricLoader.getInstance().getConfigDir().resolve("walk-jog-run.json");
     private static final Gson gson = new GsonBuilder()
@@ -32,21 +31,34 @@ public class Config {
             .setPrettyPrinting()
             .create();
 
-    private static boolean alreadyRead = false;
     public static void read() {
-        if (alreadyRead)
-            return;
 
-        try { gson.fromJson(Files.newBufferedReader(path), Config.class); }
-        catch (Exception e) { write(); }
+        try {
+            JSON = Files.readString(path);
+            gson.fromJson(JSON, ServerConfig.class);
+        }
+        catch (Exception e) {
+            write();
+        }
 
-        alreadyRead = true;
+    }
+
+    public static void applyConfig(String json) {
+
+        try {
+            JSON = json;
+            gson.fromJson(json, ServerConfig.class);
+        }
+        catch (Exception e) {
+            write();
+        }
+
     }
 
     public static void write() {
         try {
             if (!Files.exists(path)) Files.createFile(path);
-            Files.write(path, gson.toJson(Config.class.newInstance()).getBytes());
+            Files.write(path, gson.toJson(ServerConfig.class.newInstance()).getBytes());
         } catch (Exception e) {
             e.printStackTrace();
         }
