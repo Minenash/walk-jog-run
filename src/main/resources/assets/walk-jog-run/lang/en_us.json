@@ -4,12 +4,16 @@
   "walk-jog-run-client.midnightconfig.iconPosition": "Icon Position",
   "walk-jog-run-client.midnightconfig.showStaminaInIcon": "Show Stamina In Icon",
   "walk-jog-run-client.midnightconfig.showStaminaInHungerBar": "Show Stamina In Hunger Bar",
+  "walk-jog-run-client.midnightconfig.hungerBarStaminaColor": "Hunger Bar Stamina Fill Color",
+  "walk-jog-run-client.midnightconfig.hungerBarColorState": "Fill Hunger Bar Stamina Depleted or Left",
   "walk-jog-run-client.midnightconfig.enum.IconPosition.HOTBAR": "Hotbar",
   "walk-jog-run-client.midnightconfig.enum.IconPosition.CROSSHAIR": "Crosshair",
   "walk-jog-run-client.midnightconfig.enum.IconPosition.TOP_LEFT_CORNER": "Top Left",
   "walk-jog-run-client.midnightconfig.enum.IconPosition.TOP_RIGHT_CORNER": "Top Right",
   "walk-jog-run-client.midnightconfig.enum.IconPosition.BOTTOM_LEFT_CORNER": "Bottom Left",
   "walk-jog-run-client.midnightconfig.enum.IconPosition.BOTTOM_RIGHT_CORNER": "Bottom Right",
+  "walk-jog-run-client.midnightconfig.enum.HungerBarColorState.STAMINA_DEPLETED": "Stamina Depleted",
+  "walk-jog-run-client.midnightconfig.enum.HungerBarColorState.STAMINA_LEFT": "Stamina Left",
 
   "modmenu.summaryTranslation.walk-jog-run": "Adds strolling and replaces sprinting exhaustion with stamina caped by hunger",
   "modmenu.descriptionTranslation.walk-jog-run": "Adds a slower walking state and replaces exhaustion caused by sprinting with stamina caped by your hunger.\n\n§l§nWalking§r\nThis mod allows players to toggle between a slower walking pace and the usual jogging state. This is to promote slower player movement without detracting from the typical Minecraft experience.\nPlayers can use the §e§oALT§r key (configurable) to switch between the walking and jogging states.\nThe updated values for player speed can be found below §o(configurable)§r:\n- Player Walk Speed: 0.07 §o(30% Slower)§r\n- Player Jog Speed: 0.1 §o(Normal Speed)§r\n- Player Sprint Speed: 0.13 §o(30% Faster, Normal Sprint Speed)§r\n\nAn icon is added to your hud (next to you hotbar by default, but can be changed) that shows you if you're Walking, Jogging, or Running.\n\n§l§nStamina§r\nSprinting is to be altered fundamentally as well. Rather than draining from your food source, sprinting will simply drain a secondary bar and give you a slight slowness debuff after expending it all the way without allowing it to recharge. The hunger that you have instead acts as the total cap of stamina that you can utilise, a full stomach allowing you to run for much longer \nthan an empty one.\nThere are two ways that stamina is displayed on the hud:\n§lIcon:§r The icon is filled depending on how much of your stamina you've used up. It being completely filled means you have 100% of your maximum stamina (capped by your hunger).\n§lHunger Bar:§r The outline fades as you use your stamina. Since it overlays on top of your hunger bar, it's not relative to your cap."

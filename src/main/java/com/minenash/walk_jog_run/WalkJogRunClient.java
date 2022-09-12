@@ -15,12 +15,13 @@ import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.text.Text;
 import net.minecraft.util.Arm;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.Pair;
 import org.lwjgl.glfw.GLFW;
+
+import java.awt.*;
 
 public class WalkJogRunClient implements ClientModInitializer {
 
@@ -49,6 +50,7 @@ public class WalkJogRunClient implements ClientModInitializer {
     private static final MinecraftClient client = MinecraftClient.getInstance();
 
     public static int[] hungerBarStaminaYValues = new int[10];
+    public static float[] hungerBarStaminaColor = Color.decode(ClientConfig.hungerBarStaminaColor).getRGBComponents(null);
 
     @Override
     public void onInitializeClient() {
@@ -109,37 +111,44 @@ public class WalkJogRunClient implements ClientModInitializer {
                     DrawableHelper.drawTexture(matrix, x, y, size, height, 0, 0, 80, (int) (80F * height / size), 80, 80);
                 }
 
-                if (ClientConfig.showStaminaInHungerBar) {
-                    RenderSystem.setShaderTexture(0, HUNGER_STAMINA_TEXTURE);
-
-                    int n = client.getWindow().getScaledWidth() / 2 + 91 - 9;
-
-                    double s = stamina / 8.888;
-
-                    for (int x2 = 0; x2 < 10; ++x2) {
-//                    if (s > x2*9) {
-//                        int ss = (int) (s - x2*9);
-//
-//                        if (ss > 8)
-//                            DrawableHelper.drawTexture(matrix, n - x2 * 8, o, 0, 0, 9, 9, 9, 9);
-//                        else
-//                            DrawableHelper.drawTexture(matrix, n - x2 * 8 + (9 - ss), o, 9 - ss, 0, ss, 9, 9, 9);
-//                    }
-                        if (s <= x2 * 9 + 9) {
-                            int ss = (int) (x2 * 9 + 9 - s);
-                            DrawableHelper.drawTexture(matrix, n - x2 * 8, hungerBarStaminaYValues[x2], 0, 0, ss > 8 ? 9 : ss, 9, 9, 9);
-                        }
-                    }
-                }
-
+                if (ClientConfig.showStaminaInHungerBar)
+                    renderHungerBarStamina(matrix);
             }
-
-//            DrawableHelper.drawTextWithShadow(matrix, client.textRenderer, Text.literal("Stamina: §e" + stamina), 5, 5, 0xFFFFFF);
-
             matrix.pop();
 
         });
 
+    }
+
+    private void renderHungerBarStamina(MatrixStack matrix) {
+        RenderSystem.enableBlend();
+        RenderSystem.setShaderTexture(0, HUNGER_STAMINA_TEXTURE);
+        RenderSystem.setShaderColor(hungerBarStaminaColor[0], hungerBarStaminaColor[1], hungerBarStaminaColor[2], 1F);
+
+
+        int x = client.getWindow().getScaledWidth() / 2 + 91 - 9;
+        double s = stamina / 8.888;
+
+        if (ClientConfig.hungerBarColorState == ClientConfig.HungerBarColorState.STAMINA_DEPLETED) {
+            for (int x2 = 0; x2 < 10; ++x2) {
+                if (s <= x2 * 9 + 9) {
+                    int ss = (int) (x2 * 9 + 9 - s);
+                    DrawableHelper.drawTexture(matrix, x - x2 * 8, hungerBarStaminaYValues[x2], 0, 0, ss > 8 ? 9 : ss, 9, 9, 9);
+                }
+            }
+        }
+        else {
+            for (int x2 = 0; x2 < 10; ++x2) {
+                if (s > x2*9) {
+                    int ss = (int) (s - x2*9);
+
+                    if (ss > 8)
+                        DrawableHelper.drawTexture(matrix, x - x2 * 8, hungerBarStaminaYValues[x2], 0, 0, 9, 9, 9, 9);
+                    else
+                        DrawableHelper.drawTexture(matrix, x - x2 * 8 + (9 - ss), hungerBarStaminaYValues[x2], 9 - ss, 0, ss, 9, 9, 9);
+                }
+            }
+        }
     }
 
     private int getIconY() {

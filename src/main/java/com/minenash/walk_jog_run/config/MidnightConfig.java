@@ -4,6 +4,7 @@ import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.minenash.walk_jog_run.WalkJogRunClient;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.loader.api.FabricLoader;
@@ -241,6 +242,7 @@ public abstract class MidnightConfig {
                     }
                 write(modid);
                 Objects.requireNonNull(client).setScreen(parent);
+                WalkJogRunClient.hungerBarStaminaColor = Color.decode(ClientConfig.hungerBarStaminaColor).getRGBComponents(null);
             }));
 
             this.list = new MidnightConfigListWidget(this.client, this.width, this.height, 32, this.height - 32, 25);
@@ -249,7 +251,6 @@ public abstract class MidnightConfig {
             for (EntryInfo info : entries) {
                 if (info.id.equals(modid)) {
                     Text name = Objects.requireNonNullElseGet(info.name, () -> Text.translatable(translationPrefix + info.field.getName()));
-
                     if (info.widget instanceof Map.Entry) {
                         Map.Entry<ButtonWidget.PressAction, Function<Object, Text>> widget = (Map.Entry<ButtonWidget.PressAction, Function<Object, Text>>) info.widget;
                         if (info.field.getType().isEnum()) widget.setValue(value -> Text.translatable(translationPrefix + "enum." + info.field.getType().getSimpleName() + "." + info.value.toString()));
@@ -272,16 +273,19 @@ public abstract class MidnightConfig {
                             list.setScrollAmount(scrollAmount);
                         }));
                     } else if (info.widget != null) {
-                        TextFieldWidget widget = new TextFieldWidget(textRenderer, width - 160, 0, 150, 20, null);
+                        TextFieldWidget widget = new TextFieldWidget(textRenderer, width - 108, 0, 96, 20, null);
                         widget.setMaxLength(info.width);
                         widget.setText(info.tempValue);
                         Predicate<String> processor = ((BiFunction<TextFieldWidget, ButtonWidget, Predicate<String>>) info.widget).apply(widget, done);
                         widget.setTextPredicate(processor);
                         if (info.field.getAnnotation(Entry.class).isColor()) {
-                            ButtonWidget colorButton = new ButtonWidget(width - 185, 0, 20, 20, Text.literal("⬛"), (button -> {}));
+                            ButtonWidget colorButton = new ButtonWidget(width - 130, 0, 20, 20, Text.literal("⬛"), (button -> {}));
                             try {colorButton.setMessage(Text.literal("⬛").setStyle(Style.EMPTY.withColor(Color.decode(info.tempValue).getRGB())));} catch (Exception ignored) {}
                             info.colorButton = colorButton;
+                            this.list.addButton(List.of(widget, colorButton), name);
                         }
+                        else
+                            this.list.addButton(List.of(widget), name);
                     } else {
                         this.list.addButton(List.of(),name);
                     }
