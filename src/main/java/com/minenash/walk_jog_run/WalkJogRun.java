@@ -36,7 +36,6 @@ public class WalkJogRun implements ModInitializer {
 
 	private static final UUID BASE_SPEED_MODIFIER_ID = UUID.fromString("662A6B8D-DA3E-4C1C-8813-96EA6097278C");
 	private static EntityAttributeModifier BASE_SPEED_MODIFIER;
-	private static boolean USE_BASE_SPEED_MODIFIER;
 
 	private static final UUID STROLLING_SPEED_MODIFIER_ID = UUID.fromString("662A6B8D-DA3E-4C1C-8813-96EA6097278E");
 	private static EntityAttributeModifier STROLLING_SPEED_MODIFIER;
@@ -77,10 +76,16 @@ public class WalkJogRun implements ModInitializer {
 		ServerTickEvents.START_SERVER_TICK.register(id("stamina"), server -> {
 			for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
 
-				if (USE_BASE_SPEED_MODIFIER) {
-					EntityAttributeInstance instance = player.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED);
-					if (instance != null && !instance.hasModifier(BASE_SPEED_MODIFIER))
+
+				EntityAttributeInstance instance = player.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED);
+				if (instance != null) {
+					if (!instance.hasModifier(BASE_SPEED_MODIFIER)) {
 						instance.addTemporaryModifier(BASE_SPEED_MODIFIER);
+					}
+					else if (instance.getModifier(BASE_SPEED_MODIFIER_ID).getValue() != BASE_SPEED_MODIFIER.getValue()) {
+						instance.removeModifier(BASE_SPEED_MODIFIER_ID);
+						instance.addTemporaryModifier(BASE_SPEED_MODIFIER);
+					}
 				}
 
 				int max_stamina = player.getHungerManager().getFoodLevel() * ServerConfig.STAMINA_PER_FOOD_LEVEL;
@@ -132,7 +137,6 @@ public class WalkJogRun implements ModInitializer {
 				ServerConfig.STROLLING_SPEED_MODIFIER, EntityAttributeModifier.Operation.MULTIPLY_TOTAL);
 		BASE_SPEED_MODIFIER = new EntityAttributeModifier(BASE_SPEED_MODIFIER_ID, "WalkJogRun: Base speed modification",
 				ServerConfig.BASE_WALKING_SPEED_MODIFIER, EntityAttributeModifier.Operation.MULTIPLY_TOTAL);
-		USE_BASE_SPEED_MODIFIER = ServerConfig.BASE_WALKING_SPEED_MODIFIER != 0;
 	}
 
 	private void setStamina(ServerPlayerEntity player, int staminaP) {
