@@ -62,20 +62,19 @@ public class WalkJogRun implements ModInitializer {
 
 			if (strollingP) {
 				movement.addTemporaryModifier(STROLLING_SPEED_MODIFIER);
-				player.sendMessage(Text.literal("Walking (Strolling) Speed"), true);
+//				player.sendMessage(Text.literal("Walking (Strolling) Speed"), true);
 			}
 			else {
 				movement.removeModifier(STROLLING_SPEED_MODIFIER);
 
-				if (!player.isSprinting())
-					player.sendMessage(Text.literal("Jogging (Normal) Speed"), true);
+//				if (!player.isSprinting())
+//					player.sendMessage(Text.literal("Jogging (Normal) Speed"), true);
 			}
 
 		});
 
 		ServerTickEvents.START_SERVER_TICK.register(id("stamina"), server -> {
 			for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
-
 
 				EntityAttributeInstance instance = player.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED);
 				if (instance != null) {
@@ -136,7 +135,7 @@ public class WalkJogRun implements ModInitializer {
 		STROLLING_SPEED_MODIFIER = new EntityAttributeModifier(STROLLING_SPEED_MODIFIER_ID, "WalkJogRun: Strolling speed modification",
 				ServerConfig.STROLLING_SPEED_MODIFIER, EntityAttributeModifier.Operation.MULTIPLY_TOTAL);
 		BASE_SPEED_MODIFIER = new EntityAttributeModifier(BASE_SPEED_MODIFIER_ID, "WalkJogRun: Base speed modification",
-				ServerConfig.BASE_WALKING_SPEED_MODIFIER, EntityAttributeModifier.Operation.MULTIPLY_TOTAL);
+				ServerConfig.BASE_WALKING_SPEED_MODIFIER, EntityAttributeModifier.Operation.MULTIPLY_BASE);
 	}
 
 	private void setStamina(ServerPlayerEntity player, int staminaP) {
