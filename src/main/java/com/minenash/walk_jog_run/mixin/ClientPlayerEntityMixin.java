@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(ClientPlayerEntity.class)
 public class ClientPlayerEntityMixin {
 
-    @Redirect(method = "tickMovement", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/HungerManager;getFoodLevel()I"))
+    @Redirect(method = "canSprint", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/HungerManager;getFoodLevel()I"))
     public int walkJogRun$disableMinimumHungerForSprinting(HungerManager manager) {
         return 20;
     }

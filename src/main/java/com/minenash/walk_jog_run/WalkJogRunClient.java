@@ -97,7 +97,7 @@ public class WalkJogRunClient implements ClientModInitializer {
             int size = ClientConfig.iconPosition == ClientConfig.IconPosition.CROSSHAIR ? 10 : 16;
             int max_stamina = client.player.getHungerManager().getFoodLevel() * ServerConfig.STAMINA_PER_FOOD_LEVEL;
 
-            RenderSystem.setShader(GameRenderer::getPositionTexShader);
+            RenderSystem.setShader(GameRenderer::getPositionTexProgram);
             RenderSystem.enableDepthTest();
 
             RenderSystem.setShaderTexture(0, isSprinting() ? SPRINTING_TEXTURE : isStrolling ? STROLLING_TEXTURE : WALKING_TEXTURE);

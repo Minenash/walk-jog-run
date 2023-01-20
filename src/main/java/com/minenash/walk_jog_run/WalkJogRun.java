@@ -15,13 +15,14 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.stat.StatFormatter;
 import net.minecraft.stat.Stats;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.registry.Registry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import static net.minecraft.server.command.CommandManager.*;
@@ -50,7 +51,8 @@ public class WalkJogRun implements ModInitializer {
 		ServerConfig.read();
 		updateModifiers();
 
-		Registry.register(Registry.CUSTOM_STAT, "stroll_one_cm", STROLL_ONE_CM);
+
+		Registry.register(Registries.CUSTOM_STAT, "stroll_one_cm", STROLL_ONE_CM);
 		Stats.CUSTOM.getOrCreateStat(STROLL_ONE_CM, StatFormatter.DISTANCE);
 
 
