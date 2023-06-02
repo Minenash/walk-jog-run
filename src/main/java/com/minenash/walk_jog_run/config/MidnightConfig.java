@@ -10,7 +10,7 @@ import net.fabricmc.api.Environment;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.screen.Screen;
@@ -330,11 +330,11 @@ public abstract class MidnightConfig {
 
         }
         @Override
-        public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-            this.renderBackground(matrices);
-            this.list.render(matrices, mouseX, mouseY, delta);
-            drawCenteredTextWithShadow(matrices, textRenderer, title, width / 2, 15, 0xFFFFFF);
-            super.render(matrices,mouseX,mouseY,delta);
+        public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+            this.renderBackground(context);
+            this.list.render(context, mouseX, mouseY, delta);
+            context.drawCenteredTextWithShadow(textRenderer, title, width / 2, 15, 0xFFFFFF);
+            super.render(context,mouseX,mouseY,delta);
         }
     }
     @Environment(EnvType.CLIENT)
@@ -370,11 +370,11 @@ public abstract class MidnightConfig {
             this.info = info;
             children.addAll(buttons);
         }
-        public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-            buttons.forEach(b -> { b.setY(y); b.render(matrices, mouseX, mouseY, tickDelta); });
+        public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+            buttons.forEach(b -> { b.setY(y); b.render(context, mouseX, mouseY, tickDelta); });
             if (text != null && (!text.getString().contains("spacer") || !buttons.isEmpty())) {
-                if (info.centered) textRenderer.drawWithShadow(matrices, text, MinecraftClient.getInstance().getWindow().getScaledWidth() / 2f - (textRenderer.getWidth(text) / 2f), y + 5, 0xFFFFFF);
-                else DrawableHelper.drawTextWithShadow(matrices, textRenderer, text, 12, y + 5, 0xFFFFFF);
+                if (info.centered) context.drawTextWithShadow(textRenderer, text, (int)(MinecraftClient.getInstance().getWindow().getScaledWidth() / 2f - (textRenderer.getWidth(text) / 2f)), y + 5, 0xFFFFFF);
+                else context.drawTextWithShadow(textRenderer, text, 12, y + 5, 0xFFFFFF);
             }
         }
         public List<? extends Element> children() {return children;}

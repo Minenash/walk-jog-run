@@ -11,7 +11,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.InputUtil;
@@ -89,42 +89,38 @@ public class WalkJogRunClient implements ClientModInitializer {
 
         });
 
-        HudRenderCallback.EVENT.register( WalkJogRun.id("icon_render"), (matrix, tickDelta) -> {
-            matrix.push();
-
+        HudRenderCallback.EVENT.register( WalkJogRun.id("icon_render"), (context, tickDelta) -> {
             int y = getIconY();
             int x = getIconX();
             int size = ClientConfig.iconPosition == ClientConfig.IconPosition.CROSSHAIR ? 10 : 16;
             int max_stamina = client.player.getHungerManager().getFoodLevel() * ServerConfig.STAMINA_PER_FOOD_LEVEL;
 
-            RenderSystem.setShader(GameRenderer::getPositionTexProgram);
-            RenderSystem.enableDepthTest();
+//            RenderSystem.setShader(GameRenderer::getPositionTexProgram);
+//            RenderSystem.enableDepthTest();
 
-            RenderSystem.setShaderTexture(0, isSprinting() ? SPRINTING_TEXTURE : isStrolling ? STROLLING_TEXTURE : WALKING_TEXTURE);
-            DrawableHelper.drawTexture(matrix, x, y, size, size, 0, 0, 80, 80, 80, 80);
+            context.drawTexture(isSprinting() ? SPRINTING_TEXTURE : isStrolling ? STROLLING_TEXTURE : WALKING_TEXTURE,
+                    x, y, size, size, 0, 0, 80, 80, 80, 80);
 
             if (stamina < max_stamina && !client.player.isCreative()) {
                 if (ClientConfig.showStaminaInIcon) {
-                    RenderSystem.setShaderTexture(0, isSprinting() ? SPRINTING_FILL_TEXTURE : isStrolling ? STROLLING_FILL_TEXTURE : WALKING_FILL_TEXTURE);
 
                     int height = size - (int) (1F * size * stamina / max_stamina);
-                    DrawableHelper.drawTexture(matrix, x, y, size, height, 0, 0, 80, (int) (80F * height / size), 80, 80);
+                    context.drawTexture(isSprinting() ? SPRINTING_FILL_TEXTURE : isStrolling ? STROLLING_FILL_TEXTURE : WALKING_FILL_TEXTURE,
+                            x, y, size, height, 0, 0, 80, (int) (80F * height / size), 80, 80);
                 }
 
                 if (ClientConfig.showStaminaInHungerBar)
-                    renderHungerBarStamina(matrix);
+                    renderHungerBarStamina(context);
             }
-            matrix.pop();
 
         });
 
     }
 
-    private void renderHungerBarStamina(MatrixStack matrix) {
+    private void renderHungerBarStamina(DrawContext context) {
 
-        matrix.push();
         RenderSystem.enableBlend();
-        RenderSystem.setShaderTexture(0, HUNGER_STAMINA_TEXTURE);
+//        RenderSystem.setShaderTexture(0, HUNGER_STAMINA_TEXTURE);
         RenderSystem.setShaderColor(hungerBarStaminaColor[0], hungerBarStaminaColor[1], hungerBarStaminaColor[2], 1F);
 
 
@@ -135,7 +131,7 @@ public class WalkJogRunClient implements ClientModInitializer {
             for (int x2 = 0; x2 < 10; ++x2) {
                 if (s <= x2 * 9 + 9) {
                     int ss = (int) (x2 * 9 + 9 - s);
-                    DrawableHelper.drawTexture(matrix, x - x2 * 8, hungerBarStaminaYValues[x2], 0, 0, ss > 8 ? 9 : ss, 9, 9, 9);
+                    context.drawTexture(HUNGER_STAMINA_TEXTURE, x - x2 * 8, hungerBarStaminaYValues[x2], 0, 0, ss > 8 ? 9 : ss, 9, 9, 9);
                 }
             }
         }
@@ -145,15 +141,14 @@ public class WalkJogRunClient implements ClientModInitializer {
                     int ss = (int) (s - x2*9);
 
                     if (ss > 8)
-                        DrawableHelper.drawTexture(matrix, x - x2 * 8, hungerBarStaminaYValues[x2], 0, 0, 9, 9, 9, 9);
+                        context.drawTexture(HUNGER_STAMINA_TEXTURE, x - x2 * 8, hungerBarStaminaYValues[x2], 0, 0, 9, 9, 9, 9);
                     else
-                        DrawableHelper.drawTexture(matrix, x - x2 * 8 + (9 - ss), hungerBarStaminaYValues[x2], 9 - ss, 0, ss, 9, 9, 9);
+                        context.drawTexture(HUNGER_STAMINA_TEXTURE, x - x2 * 8 + (9 - ss), hungerBarStaminaYValues[x2], 9 - ss, 0, ss, 9, 9, 9);
                 }
             }
         }
         RenderSystem.setShaderColor(1,1,1, 1F);
         RenderSystem.disableBlend();
-        matrix.pop();
 
     }
 
