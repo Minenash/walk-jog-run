@@ -4,6 +4,7 @@ import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.minenash.walk_jog_run.WalkJogRunClient;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.loader.api.FabricLoader;
@@ -87,7 +88,10 @@ public abstract class MidnightConfig {
                     info.defaultValue = field.get(null);
                 } catch (IllegalAccessException ignored) {}
         }
-        try { gson.fromJson(Files.newBufferedReader(path), config); }
+        try {
+            gson.fromJson(Files.newBufferedReader(path), config);
+            WalkJogRunClient.hungerBarStaminaColor = Color.decode(ClientConfig.hungerBarStaminaColor).getRGBComponents(null);
+        }
         catch (Exception e) { write(modid); }
 
         for (EntryInfo info : entries) {
@@ -174,7 +178,7 @@ public abstract class MidnightConfig {
     }
 
     public static void write(String modid) {
-        path = FabricLoader.getInstance().getGameDir().resolve(modid + ".json");
+        path = FabricLoader.getInstance().getConfigDir().resolve(modid + ".json");
         try {
             if (!Files.exists(path)) Files.createFile(path);
             Files.write(path, gson.toJson(configClass.get(modid).getDeclaredConstructor().newInstance()).getBytes());
@@ -249,6 +253,7 @@ public abstract class MidnightConfig {
                         try {
                             info.field.set(null, info.value);
                         } catch (IllegalAccessException ignored) {}
+                        WalkJogRunClient.hungerBarStaminaColor = Color.decode(ClientConfig.hungerBarStaminaColor).getRGBComponents(null);
                     }
                 write(modid);
                 Objects.requireNonNull(client).setScreen(parent);
@@ -328,7 +333,7 @@ public abstract class MidnightConfig {
         public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
             this.renderBackground(matrices);
             this.list.render(matrices, mouseX, mouseY, delta);
-            drawCenteredText(matrices, textRenderer, title, width / 2, 15, 0xFFFFFF);
+            drawCenteredTextWithShadow(matrices, textRenderer, title, width / 2, 15, 0xFFFFFF);
             super.render(matrices,mouseX,mouseY,delta);
         }
     }

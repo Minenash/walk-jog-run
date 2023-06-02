@@ -121,6 +121,8 @@ public class WalkJogRunClient implements ClientModInitializer {
     }
 
     private void renderHungerBarStamina(MatrixStack matrix) {
+
+        matrix.push();
         RenderSystem.enableBlend();
         RenderSystem.setShaderTexture(0, HUNGER_STAMINA_TEXTURE);
         RenderSystem.setShaderColor(hungerBarStaminaColor[0], hungerBarStaminaColor[1], hungerBarStaminaColor[2], 1F);
@@ -149,6 +151,10 @@ public class WalkJogRunClient implements ClientModInitializer {
                 }
             }
         }
+        RenderSystem.setShaderColor(1,1,1, 1F);
+        RenderSystem.disableBlend();
+        matrix.pop();
+
     }
 
     private int getIconY() {
