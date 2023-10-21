@@ -67,7 +67,7 @@ public class WalkJogRun implements ModInitializer {
 //				player.sendMessage(Text.literal("Walking (Strolling) Speed"), true);
 			}
 			else {
-				movement.removeModifier(STROLLING_SPEED_MODIFIER);
+				movement.removeModifier(STROLLING_SPEED_MODIFIER.getId());
 
 //				if (!player.isSprinting())
 //					player.sendMessage(Text.literal("Jogging (Normal) Speed"), true);
@@ -132,7 +132,7 @@ public class WalkJogRun implements ModInitializer {
 	}
 
 	public static void updateModifiers() {
-		LivingEntityAccessor.setSPRINTING_SPEED_BOOST(new EntityAttributeModifier(LivingEntityAccessor.getSPRINTING_SPEED_BOOST_ID(), "Sprinting speed boost", ServerConfig.SPRINTING_SPEED_MODIFIER, EntityAttributeModifier.Operation.MULTIPLY_TOTAL));
+		LivingEntityAccessor.setSPRINTING_SPEED_BOOST(new EntityAttributeModifier(LivingEntityAccessor.getSPRINTING_SPEED_BOOST().getId(), "Sprinting speed boost", ServerConfig.SPRINTING_SPEED_MODIFIER, EntityAttributeModifier.Operation.MULTIPLY_TOTAL));
 
 		STROLLING_SPEED_MODIFIER = new EntityAttributeModifier(STROLLING_SPEED_MODIFIER_ID, "WalkJogRun: Strolling speed modification",
 				ServerConfig.STROLLING_SPEED_MODIFIER, EntityAttributeModifier.Operation.MULTIPLY_TOTAL);

@@ -17,7 +17,8 @@ public interface LivingEntityAccessor {
     }
 
     @Accessor
-    static UUID getSPRINTING_SPEED_BOOST_ID() {
+    static EntityAttributeModifier getSPRINTING_SPEED_BOOST() {
         throw new UnsupportedOperationException();
     }
+
 }
