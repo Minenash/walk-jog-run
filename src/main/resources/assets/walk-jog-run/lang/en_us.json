@@ -6,7 +6,7 @@
   "walk-jog-run-client.midnightconfig.showStaminaInHungerBar": "Show Stamina In Hunger Bar",
   "walk-jog-run-client.midnightconfig.hungerBarStaminaColor": "Hunger Bar Stamina Fill Color",
   "walk-jog-run-client.midnightconfig.hungerBarColorState": "Fill Hunger Bar Stamina Depleted or Left",
-  "walk-jog-run-client.midnightconfig.enum.IconPosition.BESIDE_HOTBAR": "Hotbar",
+  "walk-jog-run-client.midnightconfig.enum.IconPosition.HOTBAR": "Hotbar",
   "walk-jog-run-client.midnightconfig.enum.IconPosition.ABOVE_HOTBAR": "Above Hotbar",
   "walk-jog-run-client.midnightconfig.enum.IconPosition.CROSSHAIR": "Crosshair",
   "walk-jog-run-client.midnightconfig.enum.IconPosition.TOP_LEFT_CORNER": "Top Left",

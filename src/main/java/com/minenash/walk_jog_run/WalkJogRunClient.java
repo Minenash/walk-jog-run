@@ -53,7 +53,7 @@ public class WalkJogRunClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
 
-//        ClientConfig.init("walk-jog-run-client", ClientConfig.class);
+        ClientConfig.init("walk-jog-run-client", ClientConfig.class);
 
         ClientTickEvents.END_WORLD_TICK.register(client -> {
 
@@ -155,7 +155,7 @@ public class WalkJogRunClient implements ClientModInitializer {
     private static int getIconY() {
         int height = client.getWindow().getScaledHeight();
         return switch (ClientConfig.iconPosition) {
-            case BESIDE_HOTBAR -> height - 20 + 2;
+            case HOTBAR -> height - 20 + 2;
             case ABOVE_HOTBAR -> height - 50;
             case CROSSHAIR -> height / 2 + 1;
             case TOP_LEFT_CORNER, TOP_RIGHT_CORNER -> 5;
@@ -166,7 +166,7 @@ public class WalkJogRunClient implements ClientModInitializer {
     private static int getIconX() {
         int width = client.getWindow().getScaledWidth();
         return switch (ClientConfig.iconPosition) {
-            case BESIDE_HOTBAR -> width / 2 + (client.player.getMainArm() == Arm.RIGHT ? 92 : -110) + 2;
+            case HOTBAR -> width / 2 + (client.player.getMainArm() == Arm.RIGHT ? 92 : -110) + 2;
             case ABOVE_HOTBAR -> width / 2 - 5;
             case CROSSHAIR -> width / 2 + 1;
             case TOP_LEFT_CORNER, BOTTOM_LEFT_CORNER -> 5;
