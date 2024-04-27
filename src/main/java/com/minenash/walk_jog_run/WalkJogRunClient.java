@@ -53,7 +53,7 @@ public class WalkJogRunClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
 
-        ClientConfig.init("walk-jog-run-client", ClientConfig.class);
+//        ClientConfig.init("walk-jog-run-client", ClientConfig.class);
 
         ClientTickEvents.END_WORLD_TICK.register(client -> {
 
@@ -91,6 +91,8 @@ public class WalkJogRunClient implements ClientModInitializer {
     }
 
     private static void render(DrawContext context, float tickDelta) {
+        if (client.player.isSpectator())
+            return;
         int y = getIconY();
         int x = getIconX();
         int size = ClientConfig.iconPosition == ClientConfig.IconPosition.CROSSHAIR || ClientConfig.iconPosition == ClientConfig.IconPosition.ABOVE_HOTBAR? 10 : 16;

@@ -92,7 +92,7 @@ public class WalkJogRun implements ModInitializer {
 				int max_stamina = player.getHungerManager().getFoodLevel() * ServerConfig.STAMINA_PER_FOOD_LEVEL;
 				int player_stamina = stamina.getOrDefault(player, max_stamina);
 
-				if (player.isSprinting() && !player.isCreative())
+				if (player.isSprinting() && !player.isCreative() && !player.isSpectator())
 					player_stamina -= ServerConfig.STAMINA_DEPLETION_PER_TICK;
 				else
 					player_stamina += strolling.getOrDefault(player, false) ? ServerConfig.STAMINA_RECOVERY_STROLLING : ServerConfig.STAMINA_RECOVERY_WALKING;
