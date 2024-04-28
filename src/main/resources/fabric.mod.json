@@ -11,8 +11,6 @@
     "sources": "https://github.com/Minenash/walk-jog-run",
     "issues": "https://github.com/Minenash/walk-jog-run/issues"
   },
-
-
   "custom": {
     "modmenu": { "links": { "modmenu.discord": "https://discord.gg/eYf7DDHhvN" } }
   },
@@ -27,6 +25,7 @@
     "modmenu": [ "com.minenash.walk_jog_run.config.ModMenuEntryPoint" ]
   },
   "mixins": [ "walk-jog-run.mixins.json" ],
+  "accessWidener": "walk-jog-run.accesswidener",
 
   "depends": {
     "fabricloader": ">=0.14.9",

@@ -45,6 +45,8 @@ public class WalkJogRun implements ModInitializer {
 	public static final Map<PlayerEntity, Boolean> strolling = new HashMap<>();
 	public static final Map<PlayerEntity, Integer> stamina = new HashMap<>();
 
+	public static String SERVER_CONFIG_JSON = "";
+
 	@Override
 	public void onInitialize() {
 
@@ -63,19 +65,17 @@ public class WalkJogRun implements ModInitializer {
 			strolling.put(player, strollingP);
 
 			if (strollingP) {
-				movement.addTemporaryModifier(STROLLING_SPEED_MODIFIER);
-//				player.sendMessage(Text.literal("Walking (Strolling) Speed"), true);
+				if (!movement.hasModifier(STROLLING_SPEED_MODIFIER))
+					movement.addTemporaryModifier(STROLLING_SPEED_MODIFIER);
 			}
-			else {
+			else
 				movement.removeModifier(STROLLING_SPEED_MODIFIER.getId());
-
-//				if (!player.isSprinting())
-//					player.sendMessage(Text.literal("Jogging (Normal) Speed"), true);
-			}
 
 		});
 
 		ServerTickEvents.START_SERVER_TICK.register(id("stamina"), server -> {
+			if (!ServerConfig.STAMINA_ENABLED)
+				return;
 			for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
 
 				EntityAttributeInstance instance = player.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED);
@@ -111,7 +111,7 @@ public class WalkJogRun implements ModInitializer {
 
 		ServerPlayConnectionEvents.JOIN.register(id("sync_config"), (handler, sender, server) -> {
 			PacketByteBuf buf = PacketByteBufs.create();
-			buf.writeString(ServerConfig.JSON);
+			buf.writeString(SERVER_CONFIG_JSON);
 			sender.sendPacket(id("sync_config"), buf);
 		});
 
@@ -122,7 +122,7 @@ public class WalkJogRun implements ModInitializer {
 					updateModifiers();
 					for (ServerPlayerEntity player : context.getSource().getServer().getPlayerManager().getPlayerList()) {
 						PacketByteBuf buf = PacketByteBufs.create();
-						buf.writeString(ServerConfig.JSON);
+						buf.writeString(SERVER_CONFIG_JSON);
 						ServerPlayNetworking.send(player, id("sync_config"), buf);
 					}
 

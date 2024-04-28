@@ -13,10 +13,12 @@ import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.util.InputUtil;
+import net.minecraft.client.option.SimpleOption;
+import net.minecraft.client.option.StickyKeyBinding;
 import net.minecraft.entity.attribute.EntityAttributeInstance;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.text.Text;
 import net.minecraft.util.Arm;
 import net.minecraft.util.Identifier;
 import org.lwjgl.glfw.GLFW;
@@ -26,13 +28,11 @@ import java.util.UUID;
 
 public class WalkJogRunClient implements ClientModInitializer {
 
-    public static final KeyBinding STROLLING_KEYBIND = keybind("strolling", GLFW.GLFW_KEY_LEFT_ALT);
+    public static final SimpleOption<Boolean> STROLLING_TOGGLE = new SimpleOption<>("walkjogrun.keybind.strolling", SimpleOption.emptyTooltip(),
+            (optionText, value) -> value ? Text.translatable("options.key.toggle") : Text.translatable("options.key.hold"),
+            SimpleOption.BOOLEAN, true, (value) -> {});
 
-    private static KeyBinding keybind(String key, int defaultKey) {
-        KeyBinding binding = new KeyBinding("walkjogrun.keybind." + key, InputUtil.Type.KEYSYM, defaultKey, KeyBinding.MOVEMENT_CATEGORY);
-        KeyBindingHelper.registerKeyBinding(binding);
-        return binding;
-    }
+    public static final KeyBinding STROLLING_KEYBIND = new StickyKeyBinding("walkjogrun.keybind.strolling", GLFW.GLFW_KEY_LEFT_ALT, KeyBinding.MOVEMENT_CATEGORY, STROLLING_TOGGLE::getValue);
 
     public static boolean isStrolling = false;
     public static boolean wasSprinting = false;
@@ -55,6 +55,7 @@ public class WalkJogRunClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+        KeyBindingHelper.registerKeyBinding(STROLLING_KEYBIND);
 
         ClientConfig.init("walk-jog-run-client", ClientConfig.class);
 
@@ -72,9 +73,13 @@ public class WalkJogRunClient implements ClientModInitializer {
             }
             wasSprinting = isSprinting();
 
+            if (STROLLING_TOGGLE.getValue())
+                while (!isSprinting() && STROLLING_KEYBIND.wasPressed())
+                    setStrolling(isStrolling = !isStrolling);
+            else if (!isSprinting() && isStrolling != STROLLING_KEYBIND.isPressed())
+                setStrolling(isStrolling = STROLLING_KEYBIND.isPressed());
 
-            while (!isSprinting() && STROLLING_KEYBIND.wasPressed())
-                setStrolling(isStrolling = !isStrolling);
+
         });
 
         ClientPlayNetworking.registerGlobalReceiver(WalkJogRun.id("stamina"), (client1, handler, buf, responseSender) -> {
@@ -105,11 +110,11 @@ public class WalkJogRunClient implements ClientModInitializer {
         context.getMatrices().translate(0,0, 60);
 
 
-        if (stamina > 0)
+        if (stamina > 0 || !ServerConfig.STAMINA_ENABLED)
             context.drawTexture(isSprinting() ? SPRINTING_TEXTURE : isStrolling ? STROLLING_TEXTURE : WALKING_TEXTURE,
                 x, y, size, size, 0, 0, 20, 20, 20, 20);
 
-        if ( (stamina < max_stamina || max_stamina == 0) && !client.player.isCreative()) {
+        if ( ServerConfig.STAMINA_ENABLED && (stamina < max_stamina || max_stamina == 0) && !client.player.isCreative()) {
             if (ClientConfig.showStaminaInIcon) {
 
                 int height = size - (int) (1F * size * stamina / max_stamina);

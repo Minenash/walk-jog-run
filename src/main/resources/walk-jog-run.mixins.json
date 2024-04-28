@@ -10,6 +10,8 @@
   ],
   "client": [
     "ClientPlayerEntityMixin",
+    "ControlsOptionsScreenMixin",
+    "GameOptionsMixin",
     "InGameHudMixin"
   ],
   "injectors": {
