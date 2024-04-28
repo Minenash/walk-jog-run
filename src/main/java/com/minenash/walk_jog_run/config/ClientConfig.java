@@ -2,8 +2,8 @@ package com.minenash.walk_jog_run.config;
 
 public class ClientConfig extends MidnightConfig {
 
-    public enum IconPosition {HOTBAR, ABOVE_HOTBAR, CROSSHAIR, TOP_LEFT_CORNER, TOP_RIGHT_CORNER, BOTTOM_LEFT_CORNER, BOTTOM_RIGHT_CORNER }
-    public enum HungerBarColorState { STAMINA_LEFT, STAMINA_DEPLETED}
+    public enum IconPosition {HOTBAR, ABOVE_HOTBAR, CROSSHAIR, TOP_LEFT_CORNER, TOP_RIGHT_CORNER, BOTTOM_LEFT_CORNER, BOTTOM_RIGHT_CORNER}
+    public enum HungerBarColorState {STAMINA_LEFT, STAMINA_DEPLETED}
 
     @Entry public static IconPosition iconPosition = IconPosition.HOTBAR;
     @Entry public static boolean showStaminaInIcon = true;

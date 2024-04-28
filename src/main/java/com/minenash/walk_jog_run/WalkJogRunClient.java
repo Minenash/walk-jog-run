@@ -14,12 +14,15 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.entity.attribute.EntityAttributeInstance;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Arm;
 import net.minecraft.util.Identifier;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
+import java.util.UUID;
 
 public class WalkJogRunClient implements ClientModInitializer {
 
@@ -91,6 +94,7 @@ public class WalkJogRunClient implements ClientModInitializer {
     }
 
     private static void render(DrawContext context, float tickDelta) {
+
         if (client.player.isSpectator())
             return;
         int y = getIconY();
@@ -98,13 +102,14 @@ public class WalkJogRunClient implements ClientModInitializer {
         int size = ClientConfig.iconPosition == ClientConfig.IconPosition.CROSSHAIR || ClientConfig.iconPosition == ClientConfig.IconPosition.ABOVE_HOTBAR? 10 : 16;
         int max_stamina = client.player.getHungerManager().getFoodLevel() * ServerConfig.STAMINA_PER_FOOD_LEVEL;
 
-//            RenderSystem.setShader(GameRenderer::getPositionTexProgram);
-//            RenderSystem.enableDepthTest();
+        context.getMatrices().translate(0,0, 60);
 
-        context.drawTexture(isSprinting() ? SPRINTING_TEXTURE : isStrolling ? STROLLING_TEXTURE : WALKING_TEXTURE,
+
+        if (stamina > 0)
+            context.drawTexture(isSprinting() ? SPRINTING_TEXTURE : isStrolling ? STROLLING_TEXTURE : WALKING_TEXTURE,
                 x, y, size, size, 0, 0, 20, 20, 20, 20);
 
-        if (stamina < max_stamina && !client.player.isCreative()) {
+        if ( (stamina < max_stamina || max_stamina == 0) && !client.player.isCreative()) {
             if (ClientConfig.showStaminaInIcon) {
 
                 int height = size - (int) (1F * size * stamina / max_stamina);
@@ -115,6 +120,7 @@ public class WalkJogRunClient implements ClientModInitializer {
             if (ClientConfig.showStaminaInHungerBar)
                 renderHungerBarStamina(context);
         }
+        context.getMatrices().translate(0,0, -60);
     }
 
     private static void renderHungerBarStamina(DrawContext context) {
@@ -156,7 +162,7 @@ public class WalkJogRunClient implements ClientModInitializer {
         int height = client.getWindow().getScaledHeight();
         return switch (ClientConfig.iconPosition) {
             case HOTBAR -> height - 20 + 2;
-            case ABOVE_HOTBAR -> height - 50;
+            case ABOVE_HOTBAR -> height - 46;
             case CROSSHAIR -> height / 2 + 1;
             case TOP_LEFT_CORNER, TOP_RIGHT_CORNER -> 5;
             case BOTTOM_LEFT_CORNER, BOTTOM_RIGHT_CORNER -> height - 20;
@@ -176,7 +182,8 @@ public class WalkJogRunClient implements ClientModInitializer {
 
 
     private static boolean isSprinting() {
-        return client.player.isSprinting();
+        EntityAttributeInstance instance = client.player.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED);
+        return instance != null && instance.getModifier(UUID.fromString("662A6B8D-DA3E-4C1C-8813-96EA6097278D")) != null;
     }
 
     private static void setStrolling(boolean strolling) {

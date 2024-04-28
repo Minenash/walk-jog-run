@@ -97,12 +97,15 @@ public class WalkJogRun implements ModInitializer {
 				else
 					player_stamina += strolling.getOrDefault(player, false) ? ServerConfig.STAMINA_RECOVERY_STROLLING : ServerConfig.STAMINA_RECOVERY_WALKING;
 
-				if (player_stamina < 0) {
+				player_stamina = MathHelper.clamp(player_stamina, 0, max_stamina);
+				setStamina(player, player_stamina);
+
+				if (player_stamina == 0) {
 					player.setSprinting(false);
 					player.addStatusEffect( new StatusEffectInstance(StatusEffects.SLOWNESS, ServerConfig.STAMINA_EXHAUSTED_SLOWNESS_DURATION_IN_TICKS, 0, false, ServerConfig.STAMINA_EXHAUSTED_SLOWNESS_SHOW_PARTICLES));
 				}
 
-				setStamina(player, MathHelper.clamp(player_stamina, 0, max_stamina));
+
 			}
 		});
 
