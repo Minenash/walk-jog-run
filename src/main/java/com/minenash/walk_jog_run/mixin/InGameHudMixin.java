@@ -1,5 +1,6 @@
 package com.minenash.walk_jog_run.mixin;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.minenash.walk_jog_run.WalkJogRunClient;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -14,6 +15,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
@@ -33,9 +35,9 @@ public class InGameHudMixin {
         return old + (MinecraftClient.getInstance().player.getMainArm() == Arm.RIGHT ? OFFSET_RIGHT : OFFSET_LEFT);
     }
 
-    @Inject(method = "renderStatusBars", locals = LocalCapture.CAPTURE_FAILHARD, at = @At(value = "INVOKE", ordinal = 3, target = "Lnet/minecraft/client/gui/DrawContext;drawGuiTexture(Lnet/minecraft/util/Identifier;IIII)V"))
-    public void walkJogRun$getHungerBarYValues(DrawContext context, CallbackInfo ci, PlayerEntity playerEntity, int i, boolean bl, long l, int j, HungerManager hungerManager, int k, int m, int n, int o, float f, int p, int q, int r, int s, int t, int u, int v, LivingEntity livingEntity, int x, int y, int z, Identifier identifier, Identifier identifier2, Identifier identifier3, int aa) {
-        WalkJogRunClient.hungerBarStaminaYValues[y] = z;
+    @Inject(method = "renderFood", locals = LocalCapture.CAPTURE_FAILSOFT, at = @At(value = "INVOKE", ordinal = 0, target = "Lnet/minecraft/client/gui/DrawContext;drawGuiTexture(Lnet/minecraft/util/Identifier;IIII)V"))
+    public void walkJogRun$getHungerBarYValues(DrawContext context, PlayerEntity player, int top, int left, CallbackInfo ci, HungerManager hungerManager, int i, int j, int k, Identifier identifier, Identifier identifier2, Identifier identifier3, int l) {
+        WalkJogRunClient.hungerBarStaminaYValues[j] = k;
     }
 
 }

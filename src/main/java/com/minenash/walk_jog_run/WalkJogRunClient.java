@@ -2,6 +2,9 @@ package com.minenash.walk_jog_run;
 
 import com.minenash.walk_jog_run.config.ClientConfig;
 import com.minenash.walk_jog_run.config.ServerConfig;
+import com.minenash.walk_jog_run.packets.StaminaS2CPacket;
+import com.minenash.walk_jog_run.packets.StrollingC2SPacket;
+import com.minenash.walk_jog_run.packets.SyncConfigS2CPacket;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -82,12 +85,12 @@ public class WalkJogRunClient implements ClientModInitializer {
 
         });
 
-        ClientPlayNetworking.registerGlobalReceiver(WalkJogRun.id("stamina"), (client1, handler, buf, responseSender) -> {
-            stamina = buf.readInt();
+        ClientPlayNetworking.registerGlobalReceiver(StaminaS2CPacket.ID, (payload, context) -> {
+            stamina = payload.stamina();
         });
 
-        ClientPlayNetworking.registerGlobalReceiver(WalkJogRun.id("sync_config"), (client1, handler, buf, responseSender) -> {
-            ServerConfig.applyConfig(buf.readString());
+        ClientPlayNetworking.registerGlobalReceiver(SyncConfigS2CPacket.ID, (payload, context) -> {
+            ServerConfig.applyConfig(payload.json());
         });
 
         ClientPlayConnectionEvents.DISCONNECT.register(WalkJogRun.id("sync_correct"), (handler, client1) -> {
@@ -192,8 +195,6 @@ public class WalkJogRunClient implements ClientModInitializer {
     }
 
     private static void setStrolling(boolean strolling) {
-        PacketByteBuf buf = PacketByteBufs.create();
-        buf.writeBoolean(strolling);
-        ClientPlayNetworking.send( WalkJogRun.id("strolling"), buf);
+        ClientPlayNetworking.send( new StrollingC2SPacket(strolling));
     }
 }

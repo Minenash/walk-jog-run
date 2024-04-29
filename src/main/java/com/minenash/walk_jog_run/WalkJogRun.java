@@ -2,10 +2,14 @@ package com.minenash.walk_jog_run;
 
 import com.minenash.walk_jog_run.config.ServerConfig;
 import com.minenash.walk_jog_run.mixin.LivingEntityAccessor;
+import com.minenash.walk_jog_run.packets.StaminaS2CPacket;
+import com.minenash.walk_jog_run.packets.StrollingC2SPacket;
+import com.minenash.walk_jog_run.packets.SyncConfigS2CPacket;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.attribute.EntityAttributeInstance;
@@ -49,6 +53,9 @@ public class WalkJogRun implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+		PayloadTypeRegistry.playS2C().register(StaminaS2CPacket.ID, StaminaS2CPacket.CODEC);
+		PayloadTypeRegistry.playS2C().register(SyncConfigS2CPacket.ID, SyncConfigS2CPacket.CODEC);
+		PayloadTypeRegistry.playC2S().register(StrollingC2SPacket.ID, StrollingC2SPacket.CODEC);
 
 		ServerConfig.read();
 		updateModifiers();
@@ -59,17 +66,17 @@ public class WalkJogRun implements ModInitializer {
 
 
 
-		ServerPlayNetworking.registerGlobalReceiver( id("strolling"), (server, player, handler, buf, responseSender) -> {
-			EntityAttributeInstance movement = player.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED);
-			boolean strollingP = buf.readBoolean();
-			strolling.put(player, strollingP);
+		ServerPlayNetworking.registerGlobalReceiver( StrollingC2SPacket.ID, (payload, context) -> {
+			EntityAttributeInstance movement = context.player().getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED);
+			boolean strollingP = payload.isStrolling();
+			strolling.put(context.player(), strollingP);
 
 			if (strollingP) {
 				if (!movement.hasModifier(STROLLING_SPEED_MODIFIER))
 					movement.addTemporaryModifier(STROLLING_SPEED_MODIFIER);
 			}
 			else
-				movement.removeModifier(STROLLING_SPEED_MODIFIER.getId());
+				movement.removeModifier(STROLLING_SPEED_MODIFIER);
 
 		});
 
@@ -83,7 +90,7 @@ public class WalkJogRun implements ModInitializer {
 					if (!instance.hasModifier(BASE_SPEED_MODIFIER)) {
 						instance.addTemporaryModifier(BASE_SPEED_MODIFIER);
 					}
-					else if (instance.getModifier(BASE_SPEED_MODIFIER_ID).getValue() != BASE_SPEED_MODIFIER.getValue()) {
+					else if (instance.getModifier(BASE_SPEED_MODIFIER_ID).value() != BASE_SPEED_MODIFIER.value()) {
 						instance.removeModifier(BASE_SPEED_MODIFIER_ID);
 						instance.addTemporaryModifier(BASE_SPEED_MODIFIER);
 					}
@@ -110,9 +117,7 @@ public class WalkJogRun implements ModInitializer {
 		});
 
 		ServerPlayConnectionEvents.JOIN.register(id("sync_config"), (handler, sender, server) -> {
-			PacketByteBuf buf = PacketByteBufs.create();
-			buf.writeString(SERVER_CONFIG_JSON);
-			sender.sendPacket(id("sync_config"), buf);
+			sender.sendPacket(new SyncConfigS2CPacket(SERVER_CONFIG_JSON));
 		});
 
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
@@ -120,11 +125,8 @@ public class WalkJogRun implements ModInitializer {
 				.executes(context -> {
 					ServerConfig.read();
 					updateModifiers();
-					for (ServerPlayerEntity player : context.getSource().getServer().getPlayerManager().getPlayerList()) {
-						PacketByteBuf buf = PacketByteBufs.create();
-						buf.writeString(SERVER_CONFIG_JSON);
-						ServerPlayNetworking.send(player, id("sync_config"), buf);
-					}
+					context.getSource().getServer().getPlayerManager()
+							.sendToAll( ServerPlayNetworking.createS2CPacket( new SyncConfigS2CPacket(SERVER_CONFIG_JSON) ) );
 
 					context.getSource().sendMessage(Text.literal("Walk Jog Run: Config reloaded"));
 					return 1;
@@ -135,20 +137,17 @@ public class WalkJogRun implements ModInitializer {
 	}
 
 	public static void updateModifiers() {
-		LivingEntityAccessor.setSPRINTING_SPEED_BOOST(new EntityAttributeModifier(LivingEntityAccessor.getSPRINTING_SPEED_BOOST().getId(), "Sprinting speed boost", ServerConfig.SPRINTING_SPEED_MODIFIER, EntityAttributeModifier.Operation.MULTIPLY_TOTAL));
+		LivingEntityAccessor.setSPRINTING_SPEED_BOOST(new EntityAttributeModifier(LivingEntityAccessor.getSPRINTING_SPEED_BOOST().uuid(), "Sprinting speed boost", ServerConfig.SPRINTING_SPEED_MODIFIER, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
 
 		STROLLING_SPEED_MODIFIER = new EntityAttributeModifier(STROLLING_SPEED_MODIFIER_ID, "WalkJogRun: Strolling speed modification",
-				ServerConfig.STROLLING_SPEED_MODIFIER, EntityAttributeModifier.Operation.MULTIPLY_TOTAL);
+				ServerConfig.STROLLING_SPEED_MODIFIER, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
 		BASE_SPEED_MODIFIER = new EntityAttributeModifier(BASE_SPEED_MODIFIER_ID, "WalkJogRun: Base speed modification",
-				ServerConfig.BASE_WALKING_SPEED_MODIFIER, EntityAttributeModifier.Operation.MULTIPLY_BASE);
+				ServerConfig.BASE_WALKING_SPEED_MODIFIER, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE);
 	}
 
 	private void setStamina(ServerPlayerEntity player, int staminaP) {
 		stamina.put(player, staminaP);
-
-		PacketByteBuf buf = PacketByteBufs.create();
-		buf.writeInt(staminaP);
-		ServerPlayNetworking.send(player, WalkJogRun.id("stamina"), buf);
+		ServerPlayNetworking.send(player, new StaminaS2CPacket(staminaP));
 	}
 
 	public static Identifier id(String str) {
