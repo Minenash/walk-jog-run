@@ -39,10 +39,10 @@ public class WalkJogRun implements ModInitializer {
 
 	public static final Logger LOGGER = LoggerFactory.getLogger("walk-jog-run");
 
-	private static final UUID BASE_SPEED_MODIFIER_ID = UUID.fromString("662A6B8D-DA3E-4C1C-8813-96EA6097278C");
+	private static final Identifier BASE_SPEED_MODIFIER_ID = Identifier.of("walk-jog-run", "base_speed");
 	private static EntityAttributeModifier BASE_SPEED_MODIFIER;
 
-	private static final UUID STROLLING_SPEED_MODIFIER_ID = UUID.fromString("662A6B8D-DA3E-4C1C-8813-96EA6097278E");
+	private static final Identifier STROLLING_SPEED_MODIFIER_ID = Identifier.of("walk-jog-run", "strolling_speed");
 	private static EntityAttributeModifier STROLLING_SPEED_MODIFIER;
 	public static final Identifier STROLL_ONE_CM = id("stroll_one_cm");
 
@@ -72,7 +72,7 @@ public class WalkJogRun implements ModInitializer {
 			strolling.put(context.player(), strollingP);
 
 			if (strollingP) {
-				if (!movement.hasModifier(STROLLING_SPEED_MODIFIER))
+				if (!movement.hasModifier(STROLLING_SPEED_MODIFIER_ID))
 					movement.addTemporaryModifier(STROLLING_SPEED_MODIFIER);
 			}
 			else
@@ -87,7 +87,7 @@ public class WalkJogRun implements ModInitializer {
 
 				EntityAttributeInstance instance = player.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED);
 				if (instance != null) {
-					if (!instance.hasModifier(BASE_SPEED_MODIFIER)) {
+					if (!instance.hasModifier(BASE_SPEED_MODIFIER_ID)) {
 						instance.addTemporaryModifier(BASE_SPEED_MODIFIER);
 					}
 					else if (instance.getModifier(BASE_SPEED_MODIFIER_ID).value() != BASE_SPEED_MODIFIER.value()) {
@@ -137,11 +137,11 @@ public class WalkJogRun implements ModInitializer {
 	}
 
 	public static void updateModifiers() {
-		LivingEntityAccessor.setSPRINTING_SPEED_BOOST(new EntityAttributeModifier(LivingEntityAccessor.getSPRINTING_SPEED_BOOST().uuid(), "Sprinting speed boost", ServerConfig.SPRINTING_SPEED_MODIFIER, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
+		LivingEntityAccessor.setSPRINTING_SPEED_BOOST(new EntityAttributeModifier(LivingEntityAccessor.getSPRINTING_SPEED_BOOST().id(), ServerConfig.SPRINTING_SPEED_MODIFIER, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
 
-		STROLLING_SPEED_MODIFIER = new EntityAttributeModifier(STROLLING_SPEED_MODIFIER_ID, "WalkJogRun: Strolling speed modification",
+		STROLLING_SPEED_MODIFIER = new EntityAttributeModifier(STROLLING_SPEED_MODIFIER_ID,
 				ServerConfig.STROLLING_SPEED_MODIFIER, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
-		BASE_SPEED_MODIFIER = new EntityAttributeModifier(BASE_SPEED_MODIFIER_ID, "WalkJogRun: Base speed modification",
+		BASE_SPEED_MODIFIER = new EntityAttributeModifier(BASE_SPEED_MODIFIER_ID,
 				ServerConfig.BASE_WALKING_SPEED_MODIFIER, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE);
 	}
 
@@ -151,7 +151,7 @@ public class WalkJogRun implements ModInitializer {
 	}
 
 	public static Identifier id(String str) {
-		return new Identifier("walk-jog-run", str);
+		return Identifier.of("walk-jog-run", str);
 	}
 
 }

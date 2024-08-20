@@ -18,6 +18,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.option.SimpleOption;
 import net.minecraft.client.option.StickyKeyBinding;
+import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.entity.attribute.EntityAttributeInstance;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.network.PacketByteBuf;
@@ -101,7 +102,7 @@ public class WalkJogRunClient implements ClientModInitializer {
 
     }
 
-    private static void render(DrawContext context, float tickDelta) {
+    private static void render(DrawContext context, RenderTickCounter tick) {
 
         if (client.player.isSpectator())
             return;
@@ -189,9 +190,10 @@ public class WalkJogRunClient implements ClientModInitializer {
     }
 
 
+    private static final Identifier SPRINTING_MODIFIER_ID = Identifier.ofVanilla("sprinting");
     private static boolean isSprinting() {
         EntityAttributeInstance instance = client.player.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED);
-        return instance != null && instance.getModifier(UUID.fromString("662A6B8D-DA3E-4C1C-8813-96EA6097278D")) != null;
+        return instance != null && instance.getModifier(SPRINTING_MODIFIER_ID) != null;
     }
 
     private static void setStrolling(boolean strolling) {

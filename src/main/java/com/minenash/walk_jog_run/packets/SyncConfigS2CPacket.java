@@ -7,7 +7,7 @@ import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.util.Identifier;
 
 public record SyncConfigS2CPacket(String json) implements CustomPayload {
-    public static final Id<SyncConfigS2CPacket> ID = new Id<>(new Identifier("walk-jog-run", "sync_config"));
+    public static final Id<SyncConfigS2CPacket> ID = new Id<>(Identifier.of("walk-jog-run", "sync_config"));
     public static final PacketCodec<RegistryByteBuf, SyncConfigS2CPacket> CODEC = PacketCodecs.STRING.xmap(SyncConfigS2CPacket::new, SyncConfigS2CPacket::json).cast();
 
     @Override
