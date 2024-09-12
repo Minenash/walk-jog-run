@@ -13,6 +13,7 @@
   "walk-jog-run-client.midnightconfig.enum.IconPosition.TOP_RIGHT_CORNER": "Top Right",
   "walk-jog-run-client.midnightconfig.enum.IconPosition.BOTTOM_LEFT_CORNER": "Bottom Left",
   "walk-jog-run-client.midnightconfig.enum.IconPosition.BOTTOM_RIGHT_CORNER": "Bottom Right",
+  "walk-jog-run-client.midnightconfig.enum.IconPosition.NONE": "None",
   "walk-jog-run-client.midnightconfig.enum.HungerBarColorState.STAMINA_DEPLETED": "Stamina Depleted",
   "walk-jog-run-client.midnightconfig.enum.HungerBarColorState.STAMINA_LEFT": "Stamina Left",
 

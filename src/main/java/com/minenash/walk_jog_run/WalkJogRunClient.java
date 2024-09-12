@@ -106,19 +106,27 @@ public class WalkJogRunClient implements ClientModInitializer {
 
         if (client.player.isSpectator())
             return;
+
+        int max_stamina = client.player.getHungerManager().getFoodLevel() * ServerConfig.STAMINA_PER_FOOD_LEVEL;
+        boolean showStamina = ServerConfig.STAMINA_ENABLED && (stamina < max_stamina || max_stamina == 0) && !client.player.isCreative();
+
+        if (ClientConfig.iconPosition == ClientConfig.IconPosition.NONE) {
+            if (showStamina && ClientConfig.showStaminaInHungerBar)
+                renderHungerBarStamina(context);
+            return;
+        }
+
         int y = getIconY();
         int x = getIconX();
         int size = ClientConfig.iconPosition == ClientConfig.IconPosition.CROSSHAIR || ClientConfig.iconPosition == ClientConfig.IconPosition.ABOVE_HOTBAR? 10 : 16;
-        int max_stamina = client.player.getHungerManager().getFoodLevel() * ServerConfig.STAMINA_PER_FOOD_LEVEL;
 
         context.getMatrices().translate(0,0, 60);
 
-
-        if (stamina > 0 || !ServerConfig.STAMINA_ENABLED)
+        if ((stamina > 0 || !ServerConfig.STAMINA_ENABLED))
             context.drawTexture(isSprinting() ? SPRINTING_TEXTURE : isStrolling ? STROLLING_TEXTURE : WALKING_TEXTURE,
                 x, y, size, size, 0, 0, 20, 20, 20, 20);
 
-        if ( ServerConfig.STAMINA_ENABLED && (stamina < max_stamina || max_stamina == 0) && !client.player.isCreative()) {
+        if ( showStamina ) {
             if (ClientConfig.showStaminaInIcon) {
 
                 int height = size - (int) (1F * size * stamina / max_stamina);
@@ -171,10 +179,11 @@ public class WalkJogRunClient implements ClientModInitializer {
         int height = client.getWindow().getScaledHeight();
         return switch (ClientConfig.iconPosition) {
             case HOTBAR -> height - 20 + 2;
-            case ABOVE_HOTBAR -> height - 46;
+            case ABOVE_HOTBAR -> client.interactionManager.hasStatusBars() ? height - 46 : height - 34;
             case CROSSHAIR -> height / 2 + 1;
             case TOP_LEFT_CORNER, TOP_RIGHT_CORNER -> 5;
             case BOTTOM_LEFT_CORNER, BOTTOM_RIGHT_CORNER -> height - 20;
+            case NONE -> 0;
         };
     }
 
@@ -186,6 +195,7 @@ public class WalkJogRunClient implements ClientModInitializer {
             case CROSSHAIR -> width / 2 + 1;
             case TOP_LEFT_CORNER, BOTTOM_LEFT_CORNER -> 5;
             case TOP_RIGHT_CORNER, BOTTOM_RIGHT_CORNER -> width - 20;
+            case NONE -> 0;
         };
     }
 
